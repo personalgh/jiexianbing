@@ -1,4 +1,4 @@
-// Ω”œ⁄±˝.cpp : ∂®“Âøÿ÷∆Ã®”¶”√≥Ã–Úµƒ»Îø⁄µ„°£
+Ôªø// Êé•È¶ÖÈ•º.cpp : ÂÆö‰πâÊéßÂà∂Âè∞Â∫îÁî®Á®ãÂ∫èÁöÑÂÖ•Âè£ÁÇπ„ÄÇ
 //
 
 #include "stdafx.h"
@@ -13,37 +13,37 @@
 
 
 struct BALL {
-	int x;		//∫·◊¯±Í
-	int clk;	//Œª÷√ ±º‰£®ms£©
-	int y;		//◊›◊¯±Í
-	int spd;	//–°«ÚÀŸ∂»
-	int judge;	//–°«Ú « ≤√¥(œ⁄±˝°¢’®µØ)
-	int status;	//◊¥Ã¨£®«Ú°¢±˝µØ£©
+	int x;		//Ê®™ÂùêÊ†á
+	int clk;	//‰ΩçÁΩÆÊó∂Èó¥ÔºàmsÔºâ
+	int y;		//Á∫µÂùêÊ†á
+	int spd;	//Â∞èÁêÉÈÄüÂ∫¶
+	int judge;	//Â∞èÁêÉÊòØ‰ªÄ‰πà(È¶ÖÈ•º„ÄÅÁÇ∏Âºπ)
+	int status;	//Áä∂ÊÄÅÔºàÁêÉ„ÄÅÈ•ºÂºπÔºâ
 };
 
-//ª≠–°«Ú
+//ÁîªÂ∞èÁêÉ
 void drawball(int x, int y, IMAGE sbll, IMAGE sbllmb) {
 	putimage(x-40, y-40, &sbllmb, SRCPAINT);
 	putimage(x-40, y-40, &sbll, SRCAND);
 }
 
-//ª≠œ⁄±˝
+//ÁîªÈ¶ÖÈ•º
 void drawpie(int x, int y, IMAGE p, IMAGE pmb) {
 	putimage(x, y, &pmb, SRCPAINT);
 	putimage(x, y, &p, SRCAND);
 }
 
-//ª≠’®µØ
+//ÁîªÁÇ∏Âºπ
 void drawbomb(int x, int y, IMAGE bmb, IMAGE bmbmb) {
 	putimage(x, y, &bmbmb, SRCPAINT);
 	putimage(x, y, &bmb, SRCAND);
 }
 
-//”Œœ∑Ω· ¯
+//Ê∏∏ÊàèÁªìÊùü
 void gameover() {
-	settextstyle(100, 0, _T("”◊‘≤"));
+	settextstyle(100, 0, _T("ÂπºÂúÜ"));
 	settextcolor(BLUE);
-	outtextxy(200, 200, _T("”Œœ∑Ω· ¯"));
+	outtextxy(200, 200, _T("Ê∏∏ÊàèÁªìÊùü"));
 	for (int ostop = 0; ostop != 1;) {
 		if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
 			ostop++;
@@ -53,7 +53,7 @@ void gameover() {
 
 void printusername(wchar_t *usn) {
 	setbkmode(TRANSPARENT);
-	settextstyle(30, 0, _T("”◊‘≤"));
+	settextstyle(30, 0, _T("ÂπºÂúÜ"));
 	settextcolor(MAGENTA);
 	outtextxy(200, 35, L"WELCOME,");
 	outtextxy(320, 35, usn);
@@ -121,116 +121,116 @@ int main()
 		loadimage(&BLL, L"image", MAKEINTRESOURCE(bll));
 		loadimage(&BLLMB, L"image", MAKEINTRESOURCE(bllmb));
 	}
-	//”√ªß√˚
+	//Áî®Êà∑Âêç
 	BeginBatchDraw();
 	putimage(0, 0, &main);
 	EndBatchDraw();
-	InputBox(username, 30, L"«Î ‰»Î”√ªß√˚");
+	InputBox(username, 30, L"ËØ∑ËæìÂÖ•Áî®Êà∑Âêç");
 	while (true) {
 		while (mainswitch == 5) {
-			//ø™ º÷˜ΩÁ√ÊªÊÕº
+			//ÂºÄÂßã‰∏ªÁïåÈù¢ÁªòÂõæ
 			BeginBatchDraw();
 			putimage(0, 0, &main);
 
-			//¥Ú”°”√ªß√˚
+			//ÊâìÂç∞Áî®Êà∑Âêç
 			printusername(username);
 
 			MOUSEMSG GMMsg = GetMouseMsg();
-			//÷˜ø™πÿµƒ–¬”Œœ∑≈–∂œ
+			//‰∏ªÂºÄÂÖ≥ÁöÑÊñ∞Ê∏∏ÊàèÂà§Êñ≠
 			if (GMMsg.x >= 207 && GMMsg.x <= 269 && GMMsg.y >= 366 && GMMsg.y <= 563 && GMMsg.uMsg == WM_LBUTTONUP) {
 				mainswitch = 1;
 			}
-			//÷˜ø™πÿµƒºÃ–¯≈–∂œ
+			//‰∏ªÂºÄÂÖ≥ÁöÑÁªßÁª≠Âà§Êñ≠
 			if (GMMsg.x >= 327 && GMMsg.x <= 382 && GMMsg.y >= 394 && GMMsg.y <= 514 && GMMsg.uMsg == WM_LBUTTONUP) {
 				mainswitch = 2;
 			}
-			//÷˜ø™πÿµƒ≈≈––∞Ò≈–∂œ
+			//‰∏ªÂºÄÂÖ≥ÁöÑÊéíË°åÊ¶úÂà§Êñ≠
 			if (GMMsg.x >= 444 && GMMsg.x <= 504 && GMMsg.y >= 371 && GMMsg.y <= 555 && GMMsg.uMsg == WM_LBUTTONUP) {
 				mainswitch = 3;
 			}
-			//÷˜ø™πÿµƒÕÀ≥ˆ≈–∂œ
+			//‰∏ªÂºÄÂÖ≥ÁöÑÈÄÄÂá∫Âà§Êñ≠
 			if (GMMsg.x >= 564 && GMMsg.x <= 626 && GMMsg.y >= 394 && GMMsg.y <= 515 && GMMsg.uMsg == WM_LBUTTONUP) {
 				mainswitch = 4;
 			}
 
 			//======================================================================================================//
 
-			//¥•√˛–¬”Œœ∑–ßπ˚
+			//Ëß¶Êë∏Êñ∞Ê∏∏ÊàèÊïàÊûú
 			if (GMMsg.x >= 207 && GMMsg.x <= 269 && GMMsg.y >= 366 && GMMsg.y <= 563) {
 				putimage(0, 0, &newgame1);
 				printusername(username);
 			}
-			//∞¥œ¬–¬”Œœ∑–ßπ˚
+			//Êåâ‰∏ãÊñ∞Ê∏∏ÊàèÊïàÊûú
 			if (GMMsg.x >= 207 && GMMsg.x <= 269 && GMMsg.y >= 366 && GMMsg.y <= 563 && GMMsg.uMsg == WM_LBUTTONDOWN) {
 				putimage(0, 0, &newgame2);
 				printusername(username);
 			}
-			//¥•√˛ºÃ–¯–ßπ˚
+			//Ëß¶Êë∏ÁªßÁª≠ÊïàÊûú
 			if (GMMsg.x >= 327 && GMMsg.x <= 382 && GMMsg.y >= 394 && GMMsg.y <= 514) {
 				putimage(0, 0, &continue1);
 				printusername(username);
 			}
-			//∞¥œ¬ºÃ–¯–ßπ˚
+			//Êåâ‰∏ãÁªßÁª≠ÊïàÊûú
 			if (GMMsg.x >= 327 && GMMsg.x <= 382 && GMMsg.y >= 394 && GMMsg.y <= 514 && GMMsg.uMsg == WM_LBUTTONDOWN) {
 				putimage(0, 0, &continue2);
 				printusername(username);
 			}
-			//¥•√˛≈≈––∞Ò–ßπ˚
+			//Ëß¶Êë∏ÊéíË°åÊ¶úÊïàÊûú
 			if (GMMsg.x >= 444 && GMMsg.x <= 504 && GMMsg.y >= 371 && GMMsg.y <= 555) {
 				putimage(0, 0, &rankinglist1);
 				printusername(username);
 			}
-			//∞¥œ¬≈≈––∞Ò–ßπ˚
+			//Êåâ‰∏ãÊéíË°åÊ¶úÊïàÊûú
 			if (GMMsg.x >= 444 && GMMsg.x <= 504 && GMMsg.y >= 371 && GMMsg.y <= 555 && GMMsg.uMsg == WM_LBUTTONDOWN) {
 				putimage(0, 0, &rankinglist2);
 				printusername(username);
 			}
-			//¥•√˛ÕÀ≥ˆ–ßπ˚
+			//Ëß¶Êë∏ÈÄÄÂá∫ÊïàÊûú
 			if (GMMsg.x >= 564 && GMMsg.x <= 626 && GMMsg.y >= 394 && GMMsg.y <= 515) {
 				putimage(0, 0, &quit1);
 				printusername(username);
 			}
-			//∞¥œ¬ÕÀ≥ˆ–ßπ˚
+			//Êåâ‰∏ãÈÄÄÂá∫ÊïàÊûú
 			if (GMMsg.x >= 564 && GMMsg.x <= 626 && GMMsg.y >= 394 && GMMsg.y <= 515 && GMMsg.uMsg == WM_LBUTTONDOWN) {
 				putimage(0, 0, &quit2);
 				printusername(username);
 			}
 
-			//÷˜ΩÁ√ÊªÊ÷∆Ω· ¯
+			//‰∏ªÁïåÈù¢ÁªòÂà∂ÁªìÊùü
 			EndBatchDraw();
 		}
 
-		//ø™πÿ≈–∂œ
+		//ÂºÄÂÖ≥Âà§Êñ≠
 		switch (mainswitch) {
 
-			//ÕÀ≥ˆ≤ø∑÷
+			//ÈÄÄÂá∫ÈÉ®ÂàÜ
 		case 4:
 			return 0;
 
-			//≈≈––∞Ò≤ø∑÷
+			//ÊéíË°åÊ¶úÈÉ®ÂàÜ
 		case 3:
-			MessageBox(GetHWnd(), L"ø™∑¢÷–£¨æ¥«Î∆⁄¥˝¶‰(£˛¶·£˛)¶‰", L"≈≈––∞Ò", MB_OK);
+			MessageBox(GetHWnd(), L"ÂºÄÂèë‰∏≠ÔºåÊï¨ËØ∑ÊúüÂæÖÔ∏ø(Ôø£Ô∏∂Ôø£)Ô∏ø", L"ÊéíË°åÊ¶ú", MB_OK);
 			break;
 
-			//ºÃ–¯≤ø∑÷
+			//ÁªßÁª≠ÈÉ®ÂàÜ
 		case 2:
-			MessageBox(GetHWnd(), L"ø™∑¢÷–£¨æ¥«Î∆⁄¥˝¶‰(£˛¶·£˛)¶‰", L"ºÃ–¯”Œœ∑", MB_OK);
+			MessageBox(GetHWnd(), L"ÂºÄÂèë‰∏≠ÔºåÊï¨ËØ∑ÊúüÂæÖÔ∏ø(Ôø£Ô∏∂Ôø£)Ô∏ø", L"ÁªßÁª≠Ê∏∏Êàè", MB_OK);
 			break;
 
-			//–¬”Œœ∑≤ø∑÷
+			//Êñ∞Ê∏∏ÊàèÈÉ®ÂàÜ
 		case 1:
-			//ø™ ºº∆À„ ±º‰
+			//ÂºÄÂßãËÆ°ÁÆóÊó∂Èó¥
 			time_t starttime, nowtime;
 			time(&starttime);
 
-			//«Âø’
+			//Ê∏ÖÁ©∫
 			for (i = 0; i < 30; i++) {
 				ball[i].x =  0;
 				ball[i].y = 0;
 			}
 			nscore = 0;
 			life = 3;
-			//”Œœ∑÷˜—≠ª∑
+			//Ê∏∏Êàè‰∏ªÂæ™ÁéØ
 			while (true) {
 
 
@@ -238,29 +238,29 @@ int main()
 				if (mainswitch==5) {
 					break;
 				}
-				//ø™ ºªÊÕº
+				//ÂºÄÂßãÁªòÂõæ
 				BeginBatchDraw();
 
-				//±≥æ∞œ‘ æ
+				//ËÉåÊôØÊòæÁ§∫
 				putimage(0, 0, &BG);
 				setbkmode(TRANSPARENT);
 
-				//À¿Õˆ ±œ‘ æ◊Ó∫Ûµƒ’®µØ
+				//Ê≠ª‰∫°Êó∂ÊòæÁ§∫ÊúÄÂêéÁöÑÁÇ∏Âºπ
 				if (overornot == 1) {
 					drawbomb(overx, overy, bmb, bmbmb);
 				}
 
-				//¥Ú”°”√ªß√˚
+				//ÊâìÂç∞Áî®Êà∑Âêç
 				printusername(username);
 
-				//µ√∑÷œ‘ æ
-				settextstyle(30, 0, _T("”◊‘≤"));
+				//ÂæóÂàÜÊòæÁ§∫
+				settextstyle(30, 0, _T("ÂπºÂúÜ"));
 				settextcolor(MAGENTA);
 				wchar_t cscore[10] = L"nscore";
 				_itow_s(nscore, cscore, 10, 10);
 				outtextxy(640, 150, cscore);
 
-				//…˙√¸œ‘ æ
+				//ÁîüÂëΩÊòæÁ§∫
 				settextstyle(50, 0, _T("Calibri"), 0, 0, 700, false, false, false);
 				settextcolor(MAGENTA);
 				wchar_t mylife[] = L"left life =";
@@ -269,8 +269,8 @@ int main()
 				outtextxy(440, 20, mylife);
 				outtextxy(600, 20, clife);
 
-				// ±º‰œ‘ æ
-				settextstyle(30, 0, _T("”◊‘≤"));
+				//Êó∂Èó¥ÊòæÁ§∫
+				settextstyle(30, 0, _T("ÂπºÂúÜ"));
 				settextcolor(MAGENTA);
 				time(&nowtime);
 				nlasttime = begin - (nowtime - starttime);
@@ -278,15 +278,15 @@ int main()
 				_itow_s(nlasttime, clasttime, 10);
 				outtextxy(720, 146, clasttime);
 
-				//ÀÊª˙µÙ«Ú
+				//ÈöèÊú∫ÊéâÁêÉ
 				NUM = rand() % 3;
 				for (k = 0; k < 30; k++) {
 					if (ball[k].x == 0) {
-						break;									//30∏ˆ«Ú»´≤ø±ª’º”√ ±≥ˆœ÷µ⁄30«Ú…¡µƒ◊¥øˆ------∫ÛΩ”case≈–∂œµ⁄30∫≈µƒ«Èøˆ°£
+						break;									//30‰∏™ÁêÉÂÖ®ÈÉ®Ë¢´Âç†Áî®Êó∂Âá∫Áé∞Á¨¨30ÁêÉÈó™ÁöÑÁä∂ÂÜµ------ÂêéÊé•caseÂà§Êñ≠Á¨¨30Âè∑ÁöÑÊÉÖÂÜµ„ÄÇ
 					}
 				}
 
-				//‘›Õ£
+				//ÊöÇÂÅú
 				putimage(700, 225, &picexitmb, SRCPAINT);
 				putimage(700, 225, &picexit, SRCAND);
 				putimage(630, 225, &picstopmb, SRCPAINT);
@@ -316,7 +316,7 @@ int main()
 					}
 				}
 
-				//≈–∂œ===°∑’˚√ÎµÙ«Ú£®¥¥Ω®“ª∏ˆ◊¯±Í£©
+				//Âà§Êñ≠===„ÄãÊï¥ÁßíÊéâÁêÉÔºàÂàõÂª∫‰∏Ä‰∏™ÂùêÊ†áÔºâ
 				if (dt != nlasttime) {
 					ball[k].x = rand() % 700 + 50;
 					ball[k].y = 15;
@@ -325,19 +325,19 @@ int main()
 					ball[k].status = 0;
 					dt = nlasttime;
 				}
-				//ÀÊª˙£¨»˝∑÷÷Æ∂˛µƒ∏≈¬ µÙœ⁄±˝
+				//ÈöèÊú∫Ôºå‰∏âÂàÜ‰πã‰∫åÁöÑÊ¶ÇÁéáÊéâÈ¶ÖÈ•º
 				if (NUM == 0 || NUM == 1) {
 					ball[k].judge = 1;
 				}
-				//ÀÊª˙£¨»˝∑÷÷Æ“ªµƒ∏≈¬ µÙ’®µØ
+				//ÈöèÊú∫Ôºå‰∏âÂàÜ‰πã‰∏ÄÁöÑÊ¶ÇÁéáÊéâÁÇ∏Âºπ
 				if (NUM == 2) {
 					ball[k].judge = 2;
 				}
 
-				//»°µ√µ±«∞ ±º‰£®∫¡√Î£©
+				//ÂèñÂæóÂΩìÂâçÊó∂Èó¥ÔºàÊØ´ÁßíÔºâ
 				int mm = clock();
 
-				//ª≠«ÚªÚ’ﬂ’®µØ£®«ÚÕ˘œ¬µÙ£©
+				//ÁîªÁêÉÊàñËÄÖÁÇ∏ÂºπÔºàÁêÉÂæÄ‰∏ãÊéâÔºâ
 				for (i = 0; i < 30; i++) {
 					if (ball[i].x != 0) {
 						if (ball[i].clk + 300 >= mm) {
@@ -360,7 +360,7 @@ int main()
 						ball[i].y = ball[i].y + ball[i].spd;
 					}
 
-					//µΩµ◊≤ø‘Úœ˚ ß
+					//Âà∞Â∫ïÈÉ®ÂàôÊ∂àÂ§±
 					if (ball[i].y > 600) {
 						if (ball[i].judge == 1) {
 							ball[i].x = { 0 };
@@ -378,10 +378,10 @@ int main()
 					}
 				}
 
-				//—”≥Ÿ
+				//Âª∂Ëøü
 				Sleep(50);
 
-				//≥¯ ¶øÿ÷∆
+				//Âé®Â∏àÊéßÂà∂
 				{
 					if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
 						cookx = cookx + cookspeed;
@@ -417,7 +417,7 @@ int main()
 						putimage(cookx, cooky, &Lcook, SRCAND);
 					}
 				}
-				//Ω”«Ú°¢Ω”’®µØ≈–∂œ
+				//Êé•ÁêÉ„ÄÅÊé•ÁÇ∏ÂºπÂà§Êñ≠
 				for (i = 0; i < 30; i++) {
 					if (ball[i].x + 25 >= cookx&&ball[i].x - 25 <= cookx + 112 && ball[i].y + 20 >= 460 && ball[i].y - 10 <= cooky + 129) {
 						if (ball[i].judge == 1) {
@@ -445,21 +445,21 @@ int main()
 					}
 				}
 
-				//±¨’®–ßπ˚
+				//ÁàÜÁÇ∏ÊïàÊûú
 				if (nowtime <= boomtime + 1) {
 					putimage(cookx + 26, cooky - 30, &boommbpic, SRCPAINT);
 					putimage(cookx + 26, cooky - 30, &boompic, SRCAND);
 				}
 
-				//À¿Õˆ ±∏¸–¬…˙√¸ ˝
+				//Ê≠ª‰∫°Êó∂Êõ¥Êñ∞ÁîüÂëΩÊï∞
 				settextstyle(50, 0, _T("Calibri"), 0, 0, 700, false, false, false);
 				_itow_s(life, clife, 10, 10);
 				outtextxy(600, 20, clife);
 
-				//Ω· ¯ªÊÕº
+				//ÁªìÊùüÁªòÂõæ
 				EndBatchDraw();
 
-				//≈–∂œ”Œœ∑Ω· ¯
+				//Âà§Êñ≠Ê∏∏ÊàèÁªìÊùü
 				if (nlasttime == 0 || life == 0) {
 					if (overornot != 1) {
 						overornot++;
@@ -468,7 +468,7 @@ int main()
 					gameover();
 				}
 
-				//—”≥Ÿ
+				//Âª∂Ëøü
 				Sleep(10);
 			}
 			break;
