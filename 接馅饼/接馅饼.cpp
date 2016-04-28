@@ -11,6 +11,10 @@
 #define cookspeed 40
 #define ballR 40
 
+struct rank {
+	wchar_t name[30];
+	int sc;
+};
 
 struct BALL {
 	int x;		//横坐标
@@ -23,8 +27,8 @@ struct BALL {
 
 //画小球
 void drawball(int x, int y, IMAGE sbll, IMAGE sbllmb) {
-	putimage(x-40, y-40, &sbllmb, SRCPAINT);
-	putimage(x-40, y-40, &sbll, SRCAND);
+	putimage(x - 40, y - 40, &sbllmb, SRCPAINT);
+	putimage(x - 40, y - 40, &sbll, SRCAND);
 }
 
 //画馅饼
@@ -40,13 +44,20 @@ void drawbomb(int x, int y, IMAGE bmb, IMAGE bmbmb) {
 }
 
 //游戏结束
-void gameover() {
+void gameover(int &mainswitch, rank rl, wchar_t username[], int score, FILE *rkfile) {
+	rl.sc = score;
+	wcscpy_s(rl.name, username);
+	_wfopen_s(&rkfile, L"ranking.txt", L"w");
+	fwprintf(rkfile, L"%30s%6d\n", rl.name, rl.sc);
+	fclose(rkfile);
 	settextstyle(100, 0, _T("幼圆"));
 	settextcolor(BLUE);
 	outtextxy(200, 200, _T("游戏结束"));
+	outtextxy(170, 300, _T("按回车返回"));
 	for (int ostop = 0; ostop != 1;) {
-		if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
-			ostop++;
+		if (GetAsyncKeyState(VK_RETURN) & 0x1) {
+			mainswitch = 5;
+			break;
 		}
 	}
 }
@@ -55,8 +66,8 @@ void printusername(wchar_t *usn) {
 	setbkmode(TRANSPARENT);
 	settextstyle(30, 0, _T("幼圆"));
 	settextcolor(MAGENTA);
-	outtextxy(200, 35, L"WELCOME,");
-	outtextxy(320, 35, usn);
+	outtextxy(200 - 30, 35, L"WELCOME,");
+	outtextxy(320 - 30, 35, usn);
 }
 
 
@@ -69,14 +80,15 @@ int main()
 	int NUM = 0;
 	int nscore = 0, clasttime = 0;
 	int direction = 0;
-	unsigned int nlasttime;
+	unsigned int nlasttime = 0;
 	int dt = 0;
 	int life = 3;
 	int overornot = 0;
 	int overx, overy;
 	int boomtime = 0;
-	int mainswitch = 5;
+	int mainswitch = 5, ctnswitch = 0;
 	int begin = 90;
+	int timefix = 0, timeswitch = 0;
 	IMAGE BG, main, Rcook, Rcookm, Lcook, Lcookm;
 	IMAGE pi, pimb, bmb, bmbmb;
 	IMAGE boompic, boommbpic;
@@ -87,9 +99,13 @@ int main()
 	IMAGE picstop, picstopmb;
 	IMAGE quit1, quit2;
 	IMAGE BLL, BLLMB;
+	IMAGE cntn, cntnmb;
 	BALL ball[30] = { 0 };
 	MOUSEMSG GMMsg;
-	wchar_t username[30];
+	wchar_t username[30] = { '\0' };
+	rank rankinglist = { '\0' };
+	rank rankprint[30] = { '\0' };
+	FILE rkfile;
 
 
 	{
@@ -120,12 +136,17 @@ int main()
 		loadimage(&picstopmb, L"image", MAKEINTRESOURCE(stopmb));
 		loadimage(&BLL, L"image", MAKEINTRESOURCE(bll));
 		loadimage(&BLLMB, L"image", MAKEINTRESOURCE(bllmb));
+		loadimage(&cntn, L"image", MAKEINTRESOURCE(conti));
+		loadimage(&cntnmb, L"image", MAKEINTRESOURCE(contimb));
 	}
 	//用户名
 	BeginBatchDraw();
 	putimage(0, 0, &main);
 	EndBatchDraw();
 	InputBox(username, 30, L"请输入用户名");
+	if (username[0] == '\0') {
+		wcscpy(username, L"UNNAMED");
+	}
 	while (true) {
 		while (mainswitch == 5) {
 			//开始主界面绘图
@@ -140,9 +161,13 @@ int main()
 			if (GMMsg.x >= 207 && GMMsg.x <= 269 && GMMsg.y >= 366 && GMMsg.y <= 563 && GMMsg.uMsg == WM_LBUTTONUP) {
 				mainswitch = 1;
 			}
+			if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
+				mainswitch = 1;
+			}
 			//主开关的继续判断
 			if (GMMsg.x >= 327 && GMMsg.x <= 382 && GMMsg.y >= 394 && GMMsg.y <= 514 && GMMsg.uMsg == WM_LBUTTONUP) {
-				mainswitch = 2;
+				mainswitch = 1;
+				ctnswitch = 1;
 			}
 			//主开关的排行榜判断
 			if (GMMsg.x >= 444 && GMMsg.x <= 504 && GMMsg.y >= 371 && GMMsg.y <= 555 && GMMsg.uMsg == WM_LBUTTONUP) {
@@ -209,12 +234,14 @@ int main()
 
 			//排行榜部分
 		case 3:
-			MessageBox(GetHWnd(), L"开发中，敬请期待︿(￣︶￣)︿", L"排行榜", MB_OK);
+			MessageBox(GetHWnd(), L"排行榜还在开发中，敬请期待︿(￣︶￣)︿\n在rank.exe中可以查看全部分数", L"排行榜", MB_OK);
+			mainswitch = 5;
 			break;
 
 			//继续部分
 		case 2:
 			MessageBox(GetHWnd(), L"开发中，敬请期待︿(￣︶￣)︿", L"继续游戏", MB_OK);
+			mainswitch = 5;
 			break;
 
 			//新游戏部分
@@ -222,20 +249,19 @@ int main()
 			//开始计算时间
 			time_t starttime, nowtime;
 			time(&starttime);
-
 			//清空
-			for (i = 0; i < 30; i++) {
-				ball[i].x =  0;
-				ball[i].y = 0;
+			if (mainswitch == 1 && ctnswitch == 0) {
+				for (i = 0; i < 30; i++) {
+					ball[i].x = 0;
+					ball[i].y = 0;
+				}
+				nscore = 0;
+				life = 3;
 			}
-			nscore = 0;
-			life = 3;
 			//游戏主循环
 			while (true) {
 
-
-
-				if (mainswitch==5) {
+				if (mainswitch == 5) {
 					break;
 				}
 				//开始绘图
@@ -244,11 +270,6 @@ int main()
 				//背景显示
 				putimage(0, 0, &BG);
 				setbkmode(TRANSPARENT);
-
-				//死亡时显示最后的炸弹
-				if (overornot == 1) {
-					drawbomb(overx, overy, bmb, bmbmb);
-				}
 
 				//打印用户名
 				printusername(username);
@@ -274,6 +295,10 @@ int main()
 				settextcolor(MAGENTA);
 				time(&nowtime);
 				nlasttime = begin - (nowtime - starttime);
+				if (ctnswitch == 1 && timeswitch == 1) {
+					begin = timefix;
+					timeswitch = 0;
+				}
 				wchar_t clasttime[10] = L"clasttime";
 				_itow_s(nlasttime, clasttime, 10);
 				outtextxy(720, 146, clasttime);
@@ -295,15 +320,23 @@ int main()
 					GMMsg = GetMouseMsg();
 					if (GMMsg.x >= 700 && GMMsg.x <= 700 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
 						mainswitch = 5;
+						timefix = nlasttime;
+						timeswitch = 1;
 						break;
 					}
 					if (GMMsg.x >= 630 && GMMsg.x <= 630 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
 						time_t temptime1, temptime2;
 						time(&temptime1);
 						while (true) {
+							BeginBatchDraw();
+							putimage(630, 225, &cntnmb, SRCPAINT);
+							putimage(630, 225, &cntn, SRCAND);
+							EndBatchDraw();
 							GMMsg = GetMouseMsg();
 							if (GMMsg.x >= 700 && GMMsg.x <= 700 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
 								mainswitch = 5;
+								timefix = nlasttime;
+								timeswitch = 1;
 								break;
 							}
 							else if (GMMsg.x >= 630 && GMMsg.x <= 630 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
@@ -465,7 +498,7 @@ int main()
 						overornot++;
 						continue;
 					}
-					gameover();
+					gameover(mainswitch, rankinglist, username, nscore, &rkfile);
 				}
 
 				//延迟

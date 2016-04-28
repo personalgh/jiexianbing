@@ -165,6 +165,8 @@
     <Image Include="bombmb.jpg" />
     <Image Include="boom.jpg" />
     <Image Include="boommb.jpg" />
+    <Image Include="conti.jpg" />
+    <Image Include="contimb.jpg" />
     <Image Include="continue.jpg" />
     <Image Include="CTN1.jpg" />
     <Image Include="CTN2.jpg" />
