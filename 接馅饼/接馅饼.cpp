@@ -214,7 +214,6 @@ void cookctrl(int&cookx, int&direction, IMAGE&Rcookm, IMAGE&Rcook, IMAGE&Lcookm,
 			cookx = 0;
 		}
 	}
-
 	if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
 		direction = 1;
 	}
@@ -235,7 +234,7 @@ void cookctrl(int&cookx, int&direction, IMAGE&Rcookm, IMAGE&Rcook, IMAGE&Lcookm,
 	}
 }
 
-//掉到底部处理
+//接到处理
 void piegot(BALL ball[], int&cookx, int&nscore, int&life, int&overx, int&overy, int&boomtime, time_t&nowtime) {
 	for (int i = 0; i < 30; i++) {
 		if (ball[i].x + 25 >= cookx&&ball[i].x - 25 <= cookx + 112 && ball[i].y + 20 >= 460 && ball[i].y - 10 <= cooky + 129) {
