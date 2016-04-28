@@ -11,11 +11,13 @@
 #define cookspeed 40
 #define ballR 40
 
+//得分记录
 struct rank {
 	wchar_t name[30];
 	int sc;
 };
 
+//小球信息
 struct BALL {
 	int x;		//横坐标
 	int clk;	//位置时间（ms）
@@ -62,6 +64,7 @@ void gameover(int &mainswitch, rank rl, wchar_t username[], int score, FILE *rkf
 	}
 }
 
+//打印用户名
 void printusername(wchar_t *usn) {
 	setbkmode(TRANSPARENT);
 	settextstyle(30, 0, _T("幼圆"));
@@ -70,6 +73,7 @@ void printusername(wchar_t *usn) {
 	outtextxy(320 - 30, 35, usn);
 }
 
+//显示生命
 void showlife(int life) {
 	settextstyle(50, 0, _T("Calibri"), 0, 0, 700, false, false, false);
 	settextcolor(MAGENTA);
@@ -80,6 +84,7 @@ void showlife(int life) {
 	outtextxy(600, 20, clife);
 }
 
+//暂停
 void Ps(int &mainswitch, int &timefix, unsigned int &nlasttime, int &timeswitch, int &begin, IMAGE &cntn, IMAGE &cntnmb) {
 	MOUSEMSG GMMsg;
 	while (MouseHit()) {
@@ -116,6 +121,7 @@ void Ps(int &mainswitch, int &timefix, unsigned int &nlasttime, int &timeswitch,
 	}
 }
 
+//生成小球
 void creatball(BALL ball[], int &dt, unsigned int &nlasttime, int &k) {
 	if (dt != nlasttime) {
 		ball[k].x = rand() % 700 + 50;
@@ -127,6 +133,7 @@ void creatball(BALL ball[], int &dt, unsigned int &nlasttime, int &k) {
 	}
 }
 
+//显示时间
 void showtime(time_t &nowtime, unsigned int &nlasttime, int &begin, time_t &starttime, int&ctnswitch, int &timeswitch, int&timefix) {
 	settextstyle(30, 0, _T("幼圆"));
 	settextcolor(MAGENTA);
@@ -141,13 +148,122 @@ void showtime(time_t &nowtime, unsigned int &nlasttime, int &begin, time_t &star
 	outtextxy(720, 146, clasttime);
 }
 
+//显示得分
+void showscore(int &nscore) {
+	settextstyle(30, 0, _T("幼圆"));
+	settextcolor(MAGENTA);
+	wchar_t cscore[10] = L"nscore";
+	_itow_s(nscore, cscore, 10, 10);
+	outtextxy(640, 150, cscore);
+}
+
+//小球下落过程
+void ballfall(BALL ball[], int&mm,IMAGE &BLL,IMAGE&BLLMB,IMAGE&pi,IMAGE&pimb,IMAGE&bmb,IMAGE&bmbmb,int&nscore) {
+	for (int i = 0; i < 30; i++) {
+		if (ball[i].x != 0) {
+			if (ball[i].clk + 300 >= mm) {
+				if (ball[i].status % 2 == 1) {
+					drawball(ball[i].x, ball[i].y, BLL, BLLMB);
+				}
+				else if (ball[i].status % 2 == 0) {
+					if (ball[i].judge == 1) {
+						drawpie(ball[i].x - 35, ball[i].y - 20, pi, pimb);
+					}
+					if (ball[i].judge == 2) {
+						drawbomb(ball[i].x - 35, ball[i].y - 40, bmb, bmbmb);
+					}
+				}
+			}
+			else if (ball[i].clk + 300 < mm) {
+				ball[i].status++;
+				ball[i].clk = mm;
+			}
+			ball[i].y = ball[i].y + ball[i].spd;
+		}
+
+		//到底部则消失
+		if (ball[i].y > 600) {
+			if (ball[i].judge == 1) {
+				ball[i].x = { 0 };
+				ball[i].y = 0;
+				ball[i].spd = 0;
+				ball[i].judge = 0;
+				nscore -= 10;
+			}
+			if (ball[i].judge == 2) {
+				ball[i].x = { 0 };
+				ball[i].y = 0;
+				ball[i].spd = 0;
+				ball[i].judge = 0;
+			}
+		}
+	}
+}
+
+//厨师控制部分
+void cookctrl(int&cookx,int&direction,IMAGE&Rcookm,IMAGE&Rcook,IMAGE&Lcookm,IMAGE&Lcook) {
+	if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
+		cookx = cookx + cookspeed;
+		if (cookx > 671) {
+			cookx = 671;
+		}
+	}
+	if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
+		cookx = cookx - cookspeed;
+		if (cookx < 0) {
+			cookx = 0;
+		}
+	}
+	
+	if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
+		direction = 1;
+	}
+	if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
+		direction = 2;
+	}
+	if (direction == 0) {
+		putimage(cookx, cooky, &Rcookm, SRCPAINT);
+		putimage(cookx, cooky, &Rcook, SRCAND);
+	}
+	if (direction == 1) {
+		putimage(cookx, cooky, &Rcookm, SRCPAINT);
+		putimage(cookx, cooky, &Rcook, SRCAND);
+	}
+	if (direction == 2) {
+		putimage(cookx, cooky, &Lcookm, SRCPAINT);
+		putimage(cookx, cooky, &Lcook, SRCAND);
+	}
+}
+
+//掉到底部处理
+void piegot(BALL ball[],int&cookx,int&nscore,int&life,int&overx,int&overy,int&boomtime,time_t&nowtime) {
+	for (int i = 0; i < 30; i++) {
+		if (ball[i].x + 25 >= cookx&&ball[i].x - 25 <= cookx + 112 && ball[i].y + 20 >= 460 && ball[i].y - 10 <= cooky + 129) {
+			if (ball[i].judge == 1) {
+				ball[i].x = { 0 };
+				ball[i].y = 0;
+				ball[i].spd = 0;
+				ball[i].judge = 0;
+				nscore += 10;
+			}
+			if (ball[i].judge == 2) {
+				life -= 1;
+				if (life == 0) {
+					overx = ball[i].x;
+					overy = ball[i].y;
+				}
+				ball[i].x = { 0 };
+				ball[i].y = 0;
+				ball[i].spd = 0;
+				ball[i].judge = 0;
+				nscore -= 100;
+				boomtime = nowtime;
 
 
-
-
-
-
-
+			}
+		}
+	}
+}
 
 int main()
 {
@@ -348,11 +464,7 @@ int main()
 				printusername(username);
 
 				//得分显示
-				settextstyle(30, 0, _T("幼圆"));
-				settextcolor(MAGENTA);
-				wchar_t cscore[10] = L"nscore";
-				_itow_s(nscore, cscore, 10, 10);
-				outtextxy(640, 150, cscore);
+				showscore(nscore);
 
 				//生命显示
 				showlife(life);
@@ -366,7 +478,7 @@ int main()
 				putimage(630, 225, &picstopmb, SRCPAINT);
 				putimage(630, 225, &picstop, SRCAND);
 
-				//随机掉球
+				//取到空的数组位置
 				for (k = 0; k < 30; k++) {
 					if (ball[k].x == 0) {
 						break;
@@ -393,112 +505,21 @@ int main()
 				int mm = clock();
 
 				//画球或者炸弹（球往下掉）
-				for (i = 0; i < 30; i++) {
-					if (ball[i].x != 0) {
-						if (ball[i].clk + 300 >= mm) {
-							if (ball[i].status % 2 == 1) {
-								drawball(ball[i].x, ball[i].y, BLL, BLLMB);
-							}
-							else if (ball[i].status % 2 == 0) {
-								if (ball[i].judge == 1) {
-									drawpie(ball[i].x - 35, ball[i].y - 20, pi, pimb);
-								}
-								if (ball[i].judge == 2) {
-									drawbomb(ball[i].x - 35, ball[i].y - 40, bmb, bmbmb);
-								}
-							}
-						}
-						else if (ball[i].clk + 300 < mm) {
-							ball[i].status++;
-							ball[i].clk = mm;
-						}
-						ball[i].y = ball[i].y + ball[i].spd;
-					}
-
-					//到底部则消失
-					if (ball[i].y > 600) {
-						if (ball[i].judge == 1) {
-							ball[i].x = { 0 };
-							ball[i].y = 0;
-							ball[i].spd = 0;
-							ball[i].judge = 0;
-							nscore -= 10;
-						}
-						if (ball[i].judge == 2) {
-							ball[i].x = { 0 };
-							ball[i].y = 0;
-							ball[i].spd = 0;
-							ball[i].judge = 0;
-						}
-					}
-				}
+				ballfall(ball, mm, BLL, BLLMB, pi, pimb, bmb, bmbmb, nscore);
 
 				//延迟
 				Sleep(50);
 
 				//厨师控制
+				cookctrl(cookx, direction, Rcookm, Rcook, Lcookm, Lcook);
 
-				if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
-					cookx = cookx + cookspeed;
-					if (cookx > 671) {
-						cookx = 671;
-					}
-				}
-				if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
-					cookx = cookx - cookspeed;
-					if (cookx < 0) {
-						cookx = 0;
-					}
-				}
+				//退出
 				if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) {
 					return 0;
 				}
-				if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
-					direction = 1;
-				}
-				if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
-					direction = 2;
-				}
-				if (direction == 0) {
-					putimage(cookx, cooky, &Rcookm, SRCPAINT);
-					putimage(cookx, cooky, &Rcook, SRCAND);
-				}
-				if (direction == 1) {
-					putimage(cookx, cooky, &Rcookm, SRCPAINT);
-					putimage(cookx, cooky, &Rcook, SRCAND);
-				}
-				if (direction == 2) {
-					putimage(cookx, cooky, &Lcookm, SRCPAINT);
-					putimage(cookx, cooky, &Lcook, SRCAND);
-				}
 
 				//接球、接炸弹判断
-				for (i = 0; i < 30; i++) {
-					if (ball[i].x + 25 >= cookx&&ball[i].x - 25 <= cookx + 112 && ball[i].y + 20 >= 460 && ball[i].y - 10 <= cooky + 129) {
-						if (ball[i].judge == 1) {
-							ball[i].x = { 0 };
-							ball[i].y = 0;
-							ball[i].spd = 0;
-							ball[i].judge = 0;
-							nscore += 10;
-						}
-						if (ball[i].judge == 2) {
-							life -= 1;
-							if (life == 0) {
-								overx = ball[i].x;
-								overy = ball[i].y;
-							}
-							ball[i].x = { 0 };
-							ball[i].y = 0;
-							ball[i].spd = 0;
-							ball[i].judge = 0;
-							nscore -= 100;
-							boomtime = nowtime;
-
-
-						}
-					}
-				}
+				piegot(ball, cookx, nscore, life, overx, overy, boomtime, nowtime);
 
 				//爆炸效果
 				if (nowtime <= boomtime + 1) {
