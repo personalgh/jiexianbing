@@ -70,6 +70,84 @@ void printusername(wchar_t *usn) {
 	outtextxy(320 - 30, 35, usn);
 }
 
+void showlife(int life) {
+	settextstyle(50, 0, _T("Calibri"), 0, 0, 700, false, false, false);
+	settextcolor(MAGENTA);
+	wchar_t mylife[] = L"left life =";
+	wchar_t clife[10] = L"life";
+	_itow_s(life, clife, 10, 10);
+	outtextxy(440, 20, mylife);
+	outtextxy(600, 20, clife);
+}
+
+void Ps(int &mainswitch, int &timefix, unsigned int &nlasttime, int &timeswitch, int &begin, IMAGE &cntn, IMAGE &cntnmb) {
+	MOUSEMSG GMMsg;
+	while (MouseHit()) {
+		GMMsg = GetMouseMsg();
+		if (GMMsg.x >= 700 && GMMsg.x <= 700 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
+			mainswitch = 5;
+			timefix = nlasttime;
+			timeswitch = 1;
+			break;
+		}
+		if (GMMsg.x >= 630 && GMMsg.x <= 630 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
+			time_t temptime1, temptime2;
+			time(&temptime1);
+			while (true) {
+				BeginBatchDraw();
+				putimage(630, 225, &cntnmb, SRCPAINT);
+				putimage(630, 225, &cntn, SRCAND);
+				EndBatchDraw();
+				GMMsg = GetMouseMsg();
+				if (GMMsg.x >= 700 && GMMsg.x <= 700 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
+					mainswitch = 5;
+					timefix = nlasttime;
+					timeswitch = 1;
+					break;
+				}
+				else if (GMMsg.x >= 630 && GMMsg.x <= 630 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
+					time(&temptime2);
+					begin += (temptime2 - temptime1);
+					break;
+				}
+				else continue;
+			}
+		}
+	}
+}
+
+void creatball(BALL ball[], int &dt, unsigned int &nlasttime, int &k) {
+	if (dt != nlasttime) {
+		ball[k].x = rand() % 700 + 50;
+		ball[k].y = 15;
+		ball[k].spd = rand() % 20 + 5;
+		ball[k].clk = clock();
+		ball[k].status = 0;
+		dt = nlasttime;
+	}
+}
+
+void showtime(time_t &nowtime, unsigned int &nlasttime, int &begin, time_t &starttime, int&ctnswitch, int &timeswitch, int&timefix) {
+	settextstyle(30, 0, _T("幼圆"));
+	settextcolor(MAGENTA);
+	time(&nowtime);
+	nlasttime = begin - (nowtime - starttime);
+	if (ctnswitch == 1 && timeswitch == 1) {
+		begin = timefix;
+		timeswitch = 0;
+	}
+	wchar_t clasttime[10] = L"clasttime";
+	_itow_s(nlasttime, clasttime, 10);
+	outtextxy(720, 146, clasttime);
+}
+
+
+
+
+
+
+
+
 
 int main()
 {
@@ -234,13 +312,8 @@ int main()
 
 			//排行榜部分
 		case 3:
-			MessageBox(GetHWnd(), L"排行榜还在开发中，敬请期待︿(￣︶￣)︿\n在rank.exe中可以查看全部分数", L"排行榜", MB_OK);
-			mainswitch = 5;
-			break;
-
-			//继续部分
-		case 2:
-			MessageBox(GetHWnd(), L"开发中，敬请期待︿(￣︶￣)︿", L"继续游戏", MB_OK);
+			MessageBox(GetHWnd(), L"排行榜还在开发中，敬请期待︿(￣︶￣)︿\n\n在ranking.txt中可以查看全部分数", L"排行榜", MB_OK);
+			system("notepad.exe ranking.txt");
 			mainswitch = 5;
 			break;
 
@@ -282,82 +355,28 @@ int main()
 				outtextxy(640, 150, cscore);
 
 				//生命显示
-				settextstyle(50, 0, _T("Calibri"), 0, 0, 700, false, false, false);
-				settextcolor(MAGENTA);
-				wchar_t mylife[] = L"left life =";
-				wchar_t clife[10] = L"life";
-				_itow_s(life, clife, 10, 10);
-				outtextxy(440, 20, mylife);
-				outtextxy(600, 20, clife);
+				showlife(life);
 
 				//时间显示
-				settextstyle(30, 0, _T("幼圆"));
-				settextcolor(MAGENTA);
-				time(&nowtime);
-				nlasttime = begin - (nowtime - starttime);
-				if (ctnswitch == 1 && timeswitch == 1) {
-					begin = timefix;
-					timeswitch = 0;
-				}
-				wchar_t clasttime[10] = L"clasttime";
-				_itow_s(nlasttime, clasttime, 10);
-				outtextxy(720, 146, clasttime);
+				showtime(nowtime, nlasttime, begin, starttime, ctnswitch, timeswitch, timefix);
 
-				//随机掉球
-				NUM = rand() % 3;
-				for (k = 0; k < 30; k++) {
-					if (ball[k].x == 0) {
-						break;									//30个球全部被占用时出现第30球闪的状况------后接case判断第30号的情况。
-					}
-				}
-
-				//暂停
+				//按钮显示
 				putimage(700, 225, &picexitmb, SRCPAINT);
 				putimage(700, 225, &picexit, SRCAND);
 				putimage(630, 225, &picstopmb, SRCPAINT);
 				putimage(630, 225, &picstop, SRCAND);
-				while (MouseHit()) {
-					GMMsg = GetMouseMsg();
-					if (GMMsg.x >= 700 && GMMsg.x <= 700 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
-						mainswitch = 5;
-						timefix = nlasttime;
-						timeswitch = 1;
+
+				//随机掉球
+				for (k = 0; k < 30; k++) {
+					if (ball[k].x == 0) {
 						break;
-					}
-					if (GMMsg.x >= 630 && GMMsg.x <= 630 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
-						time_t temptime1, temptime2;
-						time(&temptime1);
-						while (true) {
-							BeginBatchDraw();
-							putimage(630, 225, &cntnmb, SRCPAINT);
-							putimage(630, 225, &cntn, SRCAND);
-							EndBatchDraw();
-							GMMsg = GetMouseMsg();
-							if (GMMsg.x >= 700 && GMMsg.x <= 700 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
-								mainswitch = 5;
-								timefix = nlasttime;
-								timeswitch = 1;
-								break;
-							}
-							else if (GMMsg.x >= 630 && GMMsg.x <= 630 + 50 && GMMsg.y >= 225 && GMMsg.y <= 225 + 50 && GMMsg.uMsg == WM_LBUTTONUP) {
-								time(&temptime2);
-								begin += (temptime2 - temptime1);
-								break;
-							}
-							else continue;
-						}
 					}
 				}
 
 				//判断===》整秒掉球（创建一个坐标）
-				if (dt != nlasttime) {
-					ball[k].x = rand() % 700 + 50;
-					ball[k].y = 15;
-					ball[k].spd = rand() % 20 + 5;
-					ball[k].clk = clock();
-					ball[k].status = 0;
-					dt = nlasttime;
-				}
+				creatball(ball, dt, nlasttime, k);
+
+				NUM = rand() % 3;
 				//随机，三分之二的概率掉馅饼
 				if (NUM == 0 || NUM == 1) {
 					ball[k].judge = 1;
@@ -366,6 +385,9 @@ int main()
 				if (NUM == 2) {
 					ball[k].judge = 2;
 				}
+
+				//暂停
+				Ps(mainswitch, timefix, nlasttime, timeswitch, begin, cntn, cntnmb);
 
 				//取得当前时间（毫秒）
 				int mm = clock();
@@ -415,41 +437,41 @@ int main()
 				Sleep(50);
 
 				//厨师控制
-				{
-					if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
-						cookx = cookx + cookspeed;
-						if (cookx > 671) {
-							cookx = 671;
-						}
-					}
-					if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
-						cookx = cookx - cookspeed;
-						if (cookx < 0) {
-							cookx = 0;
-						}
-					}
-					if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) {
-						return 0;
-					}
-					if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
-						direction = 1;
-					}
-					if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
-						direction = 2;
-					}
-					if (direction == 0) {
-						putimage(cookx, cooky, &Rcookm, SRCPAINT);
-						putimage(cookx, cooky, &Rcook, SRCAND);
-					}
-					if (direction == 1) {
-						putimage(cookx, cooky, &Rcookm, SRCPAINT);
-						putimage(cookx, cooky, &Rcook, SRCAND);
-					}
-					if (direction == 2) {
-						putimage(cookx, cooky, &Lcookm, SRCPAINT);
-						putimage(cookx, cooky, &Lcook, SRCAND);
+
+				if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
+					cookx = cookx + cookspeed;
+					if (cookx > 671) {
+						cookx = 671;
 					}
 				}
+				if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
+					cookx = cookx - cookspeed;
+					if (cookx < 0) {
+						cookx = 0;
+					}
+				}
+				if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) {
+					return 0;
+				}
+				if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
+					direction = 1;
+				}
+				if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
+					direction = 2;
+				}
+				if (direction == 0) {
+					putimage(cookx, cooky, &Rcookm, SRCPAINT);
+					putimage(cookx, cooky, &Rcook, SRCAND);
+				}
+				if (direction == 1) {
+					putimage(cookx, cooky, &Rcookm, SRCPAINT);
+					putimage(cookx, cooky, &Rcook, SRCAND);
+				}
+				if (direction == 2) {
+					putimage(cookx, cooky, &Lcookm, SRCPAINT);
+					putimage(cookx, cooky, &Lcook, SRCAND);
+				}
+
 				//接球、接炸弹判断
 				for (i = 0; i < 30; i++) {
 					if (ball[i].x + 25 >= cookx&&ball[i].x - 25 <= cookx + 112 && ball[i].y + 20 >= 460 && ball[i].y - 10 <= cooky + 129) {
@@ -485,9 +507,7 @@ int main()
 				}
 
 				//死亡时更新生命数
-				settextstyle(50, 0, _T("Calibri"), 0, 0, 700, false, false, false);
-				_itow_s(life, clife, 10, 10);
-				outtextxy(600, 20, clife);
+				showlife(life);
 
 				//结束绘图
 				EndBatchDraw();
