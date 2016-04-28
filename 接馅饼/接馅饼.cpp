@@ -158,7 +158,7 @@ void showscore(int &nscore) {
 }
 
 //小球下落过程
-void ballfall(BALL ball[], int&mm,IMAGE &BLL,IMAGE&BLLMB,IMAGE&pi,IMAGE&pimb,IMAGE&bmb,IMAGE&bmbmb,int&nscore) {
+void ballfall(BALL ball[], int&mm, IMAGE &BLL, IMAGE&BLLMB, IMAGE&pi, IMAGE&pimb, IMAGE&bmb, IMAGE&bmbmb, int&nscore) {
 	for (int i = 0; i < 30; i++) {
 		if (ball[i].x != 0) {
 			if (ball[i].clk + 300 >= mm) {
@@ -201,7 +201,7 @@ void ballfall(BALL ball[], int&mm,IMAGE &BLL,IMAGE&BLLMB,IMAGE&pi,IMAGE&pimb,IMA
 }
 
 //厨师控制部分
-void cookctrl(int&cookx,int&direction,IMAGE&Rcookm,IMAGE&Rcook,IMAGE&Lcookm,IMAGE&Lcook) {
+void cookctrl(int&cookx, int&direction, IMAGE&Rcookm, IMAGE&Rcook, IMAGE&Lcookm, IMAGE&Lcook) {
 	if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
 		cookx = cookx + cookspeed;
 		if (cookx > 671) {
@@ -214,7 +214,7 @@ void cookctrl(int&cookx,int&direction,IMAGE&Rcookm,IMAGE&Rcook,IMAGE&Lcookm,IMAG
 			cookx = 0;
 		}
 	}
-	
+
 	if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
 		direction = 1;
 	}
@@ -236,7 +236,7 @@ void cookctrl(int&cookx,int&direction,IMAGE&Rcookm,IMAGE&Rcook,IMAGE&Lcookm,IMAG
 }
 
 //掉到底部处理
-void piegot(BALL ball[],int&cookx,int&nscore,int&life,int&overx,int&overy,int&boomtime,time_t&nowtime) {
+void piegot(BALL ball[], int&cookx, int&nscore, int&life, int&overx, int&overy, int&boomtime, time_t&nowtime) {
 	for (int i = 0; i < 30; i++) {
 		if (ball[i].x + 25 >= cookx&&ball[i].x - 25 <= cookx + 112 && ball[i].y + 20 >= 460 && ball[i].y - 10 <= cooky + 129) {
 			if (ball[i].judge == 1) {
@@ -262,6 +262,18 @@ void piegot(BALL ball[],int&cookx,int&nscore,int&life,int&overx,int&overy,int&bo
 
 			}
 		}
+	}
+}
+
+//新游戏清空
+void clearthem(int&mainswitch, int&ctnswitch, BALL ball[], int&nscore, int&life) {
+	if (mainswitch == 1 && ctnswitch == 0) {
+		for (int i = 0; i < 30; i++) {
+			ball[i].x = 0;
+			ball[i].y = 0;
+		}
+		nscore = 0;
+		life = 3;
 	}
 }
 
@@ -438,15 +450,10 @@ int main()
 			//开始计算时间
 			time_t starttime, nowtime;
 			time(&starttime);
+
 			//清空
-			if (mainswitch == 1 && ctnswitch == 0) {
-				for (i = 0; i < 30; i++) {
-					ball[i].x = 0;
-					ball[i].y = 0;
-				}
-				nscore = 0;
-				life = 3;
-			}
+			clearthem(mainswitch, ctnswitch, ball, nscore, life);
+
 			//游戏主循环
 			while (true) {
 
